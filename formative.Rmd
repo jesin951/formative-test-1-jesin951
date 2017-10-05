@@ -1,0 +1,53 @@
+---
+title: "Formative test 1"
+author: "Xiaoliang Zhou"
+date: "October 5, 2017"
+output: html_document
+---
+
+```{r, warning=F}
+#4 read in data
+D1 = read.csv('D:/2017, fall/HUDK 4050 Core Methods in Educational Data Mining/formative-test-1-jesin951/HMXPC13_DI_v2_5-14-14.csv', header = T)
+
+#5 meaning of DI
+#DI means de-identification which "removes outliers and highly active users" so that these unique users may not be identified.
+
+#6 certified students in 2012
+CS50 = D1[D1$course_id=='HarvardX/CS50x/2012',]
+CS50_certified = sum(CS50$certified)
+CS50_certified   
+   
+#7 number of registered students
+CS50_Colombia = CS50[CS50$final_cc_cname_DI=='Colombia',]
+CS50_Colombia_date = CS50_Colombia[CS50_Colombia$start_time_DI=='2012-10-15',]
+dim(CS50_Colombia_date)[1]  
+
+#8 select France
+D2 = D1[D1$final_cc_cname_DI=='Colombia',]
+myvars = names(D2) %in% c('userid_DI', 'start_time_DI') 
+D2 = D2[myvars]
+
+#9 spread dataframe
+library(tidyr)
+library(dplyr)
+D2 = cbind(D2, 1)
+colnames(D2)=c('userid_DI','start_time_DI','registered')
+D3 = D2 %>% spread(start_time_DI,registered,fill = NA)
+
+#10 make row names
+rownames(D3) = D3[,1]
+D3 = D3[,-1]
+
+#11 make matrix
+M1 = as.matrix(D3)
+
+#12 transpose matrix
+M2 = t(M1)
+
+#13 find out whether register on the same day
+M3 = M1 %*% M2
+
+#14 diagonal into NA's
+diag(M3) = NA
+
+```
